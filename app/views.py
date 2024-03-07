@@ -58,7 +58,7 @@ def upload():
 
         else:
             flash('Invalid file format. Please upload only jpg or png files.', 'danger')
-    return render_template('upload.html', form=form)  # Pass the form to the template
+    return render_template('upload.html', form=form)  
 
 @app.route('/uploads/<filename>')
 def get_image(filename):
