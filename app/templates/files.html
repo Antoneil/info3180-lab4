@@ -3,9 +3,11 @@
 {% block main %}
   <h1 class="page-header">List of Uploaded Images</h1>
 
-  <ul>
+  <div class="image-list">
     {% for image_url in image_urls %}
-      <li><img src="{{ image_url }}" alt="Uploaded Image"></li>
+      <div class="image-item">
+        <img src="{{ image_url }}" alt="Uploaded Image">
+      </div>
     {% endfor %}
-  </ul>
+  </div>
 {% endblock %}

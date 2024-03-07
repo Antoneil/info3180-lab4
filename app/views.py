@@ -86,7 +86,7 @@ def login():
 
         # change this to actually validate the entire form submission
         # and not just one field
-        if user and check_password_hash(user.password_hash, password):
+        if user and user.check_password(password):
             # If the user exists and the password is correct, log in the user
             login_user(user)
             flash('Login successful!', 'success')

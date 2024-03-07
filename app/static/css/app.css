@@ -18,3 +18,20 @@ body {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+.image-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.image-item {
+  flex-basis: calc(33.33% - 20px); /* 3 images per row with margin */
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.image-item img {
+  width: 100%;
+  height: auto; /* Maintain aspect ratio */
+}
