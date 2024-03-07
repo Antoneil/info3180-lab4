@@ -6,7 +6,9 @@ from werkzeug.utils import secure_filename
 from app.models import UserProfile
 from app.forms import LoginForm
 from app.forms import UploadForm 
-from werkzeug.security import check_password_hash  
+from werkzeug.security import check_password_hash
+from flask import send_from_directory
+
 ###
 # Routing for your application.
 ###
@@ -28,6 +30,15 @@ def about():
     """Render the website's about page."""
     return render_template('about.html', name="Mary Jane")
 
+def get_uploaded_images():
+    rootdir = os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'])
+    uploaded_images = []
+
+    for subdir, dirs, files in os.walk(rootdir):
+        for file in files:
+            uploaded_images.append(file)
+
+    return uploaded_images
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
@@ -49,6 +60,18 @@ def upload():
             flash('Invalid file format. Please upload only jpg or png files.', 'danger')
     return render_template('upload.html', form=form)  # Pass the form to the template
 
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    uploads_folder = os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'])
+    return send_from_directory(uploads_folder, filename)
+
+@app.route('/files')
+@login_required
+def files():
+    image_filenames = get_uploaded_images()
+    image_urls = [url_for('get_image', filename=filename) for filename in image_filenames]
+
+    return render_template('files.html', image_urls=image_urls)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():

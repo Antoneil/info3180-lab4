@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block main %}
+  <h1 class="page-header">List of Uploaded Images</h1>
+
+  <ul>
+    {% for image_url in image_urls %}
+      <li><img src="{{ image_url }}" alt="Uploaded Image"></li>
+    {% endfor %}
+  </ul>
+{% endblock %}
