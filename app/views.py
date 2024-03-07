@@ -5,10 +5,17 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
 from app.models import UserProfile
 from app.forms import LoginForm
+from app.forms import UploadForm 
 from werkzeug.security import check_password_hash  
 ###
 # Routing for your application.
 ###
+# Define the allowed_file function
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route('/')
 def home():
@@ -24,16 +31,23 @@ def about():
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
-    # Instantiate your form class
+    form = UploadForm()
 
     # Validate file upload on submit
     if form.validate_on_submit():
         # Get file data and save to your uploads folder
+        file = form.file.data
 
-        flash('File Saved', 'success')
-        return redirect(url_for('home')) # Update this to redirect the user to a route that displays all uploaded image files
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-    return render_template('upload.html')
+            flash('File Saved', 'success')
+            return redirect(url_for('home'))  # Redirect to the home page
+
+        else:
+            flash('Invalid file format. Please upload only jpg or png files.', 'danger')
+    return render_template('upload.html', form=form)  # Pass the form to the template
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -44,17 +58,16 @@ def login():
         username = form.username.data
         password = form.password.data
 
-    # Query the database for a user based on the username
+        # Query the database for a user based on the username
         user = UserProfile.query.filter_by(username=username).first()
 
-    # change this to actually validate the entire form submission
-    # and not just one field
-    if user and check_password_hash(user.password_hash, password):
+        # change this to actually validate the entire form submission
+        # and not just one field
+        if user and check_password_hash(user.password_hash, password):
             # If the user exists and the password is correct, log in the user
             login_user(user)
             flash('Login successful!', 'success')
             return redirect(url_for("home"))  # Redirect to the home page
-
         else:
             flash('Invalid username or password. Please try again.', 'danger')
 
